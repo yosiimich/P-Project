@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>굿플랜트</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      * {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 네비게이션 바 -->
+    <nav class="bg-gray-50 shadow-3xl">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <a href="/" class="flex items-center">
+              <span class="text-xl font-bold text-gray-800">굿플랜트</span>
+            </a>
+          </div>
+          <div class="flex space-x-4">
+            <a href="/login" class="text-gray-600 hover:text-gray-900"
+              >로그인</a
+            >
+            <a href="/register" class="text-gray-600 hover:text-gray-900"
+              >회원가입</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 본문 내용을 main 태그로 감싸기 -->
+    <main><%- body %></main>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-800 py-8 mt-auto">
+      <div class="text-center text-gray-400">
+        <p>&copy; 2024 맞춤법/발음 교정 서비스. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
