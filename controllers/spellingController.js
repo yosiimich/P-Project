@@ -13,12 +13,12 @@ const getSpelling = (req, res) => {
 
 //@desc Post login page
 //@route POST /
-const saveScript= asyncHandler(async (req, res) => {
+const saveScript= async (req, res, next) => {
     const { title, text } = req.body;
     const token = req.cookies.token
     const decoded = jwt.verify(token, jwtSecret); 
     const email = decoded.email;
-    
+
     if (!title || !text ) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -29,11 +29,12 @@ const saveScript= asyncHandler(async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
       }
       res.status(200).json({ message: "Script save Complete" });
+      next();
     });
-  });
+  };
 
 const spellCheck=(req, res)=>{
-    console.log("spellCheck")
+    console.log("spellCheck");
 };
 
 module.exports ={getSpelling, saveScript, spellCheck}
