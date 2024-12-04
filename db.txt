@@ -15,3 +15,30 @@ CREATE TABLE `users` (
 INSERT into users values(0, "admin", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "admin123@gmail.com", 1);
 INSERT into users values(0, "test", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "test123@gmail.com", 0);
 
+
+CREATE TABLE `script` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `author_email` VARCHAR(100) NOT NULL,
+    `title` VARCHAR(100) NOT NULL,
+    `content` TEXT NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `expired_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`author_email`) REFERENCES `users`(`email`) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DELIMITER $$
+
+CREATE TRIGGER `set_expired_at`
+BEFORE INSERT ON `script`
+FOR EACH ROW
+BEGIN
+    IF NEW.expired_at IS NULL THEN
+        SET NEW.expired_at = DATE_ADD(NOW(), INTERVAL 1 MONTH);
+    END IF;
+END$$
+
+DELIMITER ;
+

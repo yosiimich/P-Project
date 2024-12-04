@@ -11,7 +11,8 @@ app.set("views", "./views");
 
 app.use(express.static("./public"));
 app.use(methodOverride("_method"));
- 
+app.use(cookieParser()); 
+
 const port = process.env.PORT;
 
 app.use(express.json());
