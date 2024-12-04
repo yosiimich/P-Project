@@ -1,5 +1,7 @@
 CREATE DATABASE test_db default CHARACTER SET UTF8; 
 
+use test_db;
+
 CREATE TABLE `users` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50) NOT NULL,
