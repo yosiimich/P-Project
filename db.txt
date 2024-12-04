@@ -1,0 +1,15 @@
+CREATE DATABASE test_db default CHARACTER SET UTF8; 
+
+CREATE TABLE `users` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(50) NOT NULL,
+    `passwd` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(100) NOT NULL,
+    `role` TINYINT DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT into users values(0, "admin", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "admin123@gmail.com", 1);
+INSERT into users values(0, "test", "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4", "test123@gmail.com", 0);
+
