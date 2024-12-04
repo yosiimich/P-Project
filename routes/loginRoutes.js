@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getMain } = require("../controllers/mainController");
-const { getLogin, loginUser, logout, getRegister,registerUser } = require("../controllers/loginController");
+const { getMain, getLogin, loginUser, logout, getRegister,registerUser } = require("../controllers/loginController");
 
 router.route("/").get(getMain)
 router.route("/login").get(getLogin).post(loginUser);

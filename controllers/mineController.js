@@ -8,7 +8,7 @@ const jwtSecret = process.env.JWT_SECRET;  // npm i jsonwebtoken
 //@desc Get login page
 //@route GET /
 const getMine = (req, res) => {
-    res.render("main");
+    res.render("mine");
 };  
 
 module.exports ={getMine}

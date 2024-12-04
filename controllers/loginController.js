@@ -7,12 +7,16 @@ const jwtSecret = process.env.JWT_SECRET;  // npm i jsonwebtoken
 
 //@desc Get login page
 //@route GET /
+const getMain = (req, res)=>{
+  res.render("main");
+};
+
 const getLogin = (req, res) => {
   res.render("login");
 };  
 
 //@desc Login user
-//@route POST /
+//@route POST /login
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   
@@ -86,4 +90,4 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = { getRegister,getLogin, loginUser, logout, registerUser };
+module.exports = {getMain, getRegister,getLogin, loginUser, logout, registerUser };
