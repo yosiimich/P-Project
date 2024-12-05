@@ -5,13 +5,13 @@ const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;  // npm i jsonwebtoken
 
 
-//@desc Get login page
+//@desc Get spelling-check page
 //@route GET /
 const getSpelling = (req, res) => {
     res.render("spelling-check");
 };  
 
-//@desc Post login page
+//@desc Post spelling-check page
 //@route POST /
 const saveScript= async (req, res, next) => {
     const { title, text } = req.body;
@@ -28,7 +28,6 @@ const saveScript= async (req, res, next) => {
         console.error("Error inserting script:", error);
         return res.status(500).json({ message: "Internal Server Error" });
       }
-      res.status(200).json({ message: "Script save Complete" });
       next();
     });
   };
