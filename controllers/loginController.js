@@ -11,12 +11,19 @@ const getMain = (req, res) => {
   res.render("main");
 };
 
+const getNotice = (req, res) => {
+  res.render("notice");
+};
+
+
 //레이아웃 지정 필수
 const getLogin = (req, res) => {
   res.render("login", {
     layout: "layouts/mainFrame", // 레이아웃 지정
   });
 };
+
+
 
 //@desc Login user
 //@route POST /login
@@ -103,6 +110,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 module.exports = {
   getMain,
+  getNotice,
   getRegister,
   getLogin,
   loginUser,
