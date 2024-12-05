@@ -15,15 +15,12 @@ const getNotice = (req, res) => {
   res.render("notice");
 };
 
-
 //레이아웃 지정 필수
 const getLogin = (req, res) => {
   res.render("login", {
     layout: "layouts/mainFrame", // 레이아웃 지정
   });
 };
-
-
 
 //@desc Login user
 //@route POST /login
@@ -72,7 +69,8 @@ const logout = (req, res) => {
   }
 
   res.clearCookie("token", { httpOnly: true });
-  res.status(200).json({ message: "Logout successful" });
+  //res.status(200).json({ message: "Logout successful" });
+  return res.redirect("/");
 };
 
 // @desc Register Page
@@ -84,9 +82,9 @@ const getRegister = (req, res) => {
 // @desc Register user
 // @route POST /register
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, name, password, password2 } = req.body;
+  const { email, name, password, password2 } = req.body;
 
-  if (!username || !name || !password || !password2) {
+  if (!email || !name || !password || !password2) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -96,8 +94,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const pw = crypto.createHash("sha256").update(password).digest("hex");
   dbConnect.query(
-    "INSERT INTO users (username, name, password) VALUES (?, ?, ?)",
-    [username, name, pw],
+    "INSERT INTO users (email, name, passwd ,role) VALUES (?, ?, ?, 0)",
+    [email, name, pw],
     function (error, results) {
       if (error) {
         console.error("Error inserting user:", error);
