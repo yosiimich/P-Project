@@ -42,3 +42,28 @@ END$$
 
 DELIMITER ;
 
+CREATE TABLE `voice` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `author_email` VARCHAR(100) NOT NULL,
+    `url` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `expired_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`author_email`) REFERENCES `users`(`email`) 
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DELIMITER $$
+
+CREATE TRIGGER `set_expired_at_voice`
+BEFORE INSERT ON `voice`
+FOR EACH ROW
+BEGIN
+    IF NEW.expired_at IS NULL THEN
+        SET NEW.expired_at = DATE_ADD(NOW(), INTERVAL 1 MONTH);
+    END IF;
+END$$
+
+DELIMITER ;
+
