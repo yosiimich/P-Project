@@ -38,6 +38,16 @@
               <span class="text-xl font-bold text-gray-800">굿플랜트</span>
             </a>
           </div>
+          <% if (locals.user) { %>
+          <div class="flex space-x-4">
+            <a href="/mine" class="text-gray-600 hover:text-gray-900"
+              >마이페이지</a
+            >
+            <a href="/logout" class="text-gray-600 hover:text-gray-900"
+              >로그아웃</a
+            >
+          </div>
+          <% } else { %>
           <div class="flex space-x-4">
             <a href="/login" class="text-gray-600 hover:text-gray-900"
               >로그인</a
@@ -45,6 +55,7 @@
             <a href="/register" class="text-gray-600 hover:text-gray-900"
               >회원가입</a
             >
+            <% } %>
           </div>
         </div>
       </div>
@@ -59,5 +70,6 @@
         <p>&copy; 2024 맞춤법/발음 교정 서비스. All rights reserved.</p>
       </div>
     </footer>
+    <%- script %>
   </body>
 </html>

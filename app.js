@@ -1,6 +1,7 @@
 const express = require("express");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
+const { checkUser } = require("./middlewares/checkLogin");
 require("dotenv").config();
 
 const cookieParser = require("cookie-parser");
@@ -23,6 +24,7 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(checkUser);
 
 app.use("/", require("./routes/loginRoutes"));
 app.use("/history", require("./routes/historyRoutes"));

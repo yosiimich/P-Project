@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
 
+// 로그인 필수 체크
 const checkLogin = async (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   const token = req.cookies.token;
@@ -22,4 +23,21 @@ const checkLogin = async (req, res, next) => {
   }
 };
 
-module.exports = checkLogin;
+// 현재 로그인 상태 체크
+const checkUser = async (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, jwtSecret);
+      res.locals.user = decoded;
+    } catch (error) {
+      res.locals.user = null;
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+};
+
+module.exports = { checkLogin, checkUser };
