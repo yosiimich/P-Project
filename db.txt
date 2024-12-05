@@ -67,3 +67,12 @@ END$$
 
 DELIMITER ;
 
+CREATE TABLE `ai_script` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `script_id` INT NOT NULL,
+    `text` TEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`script_id`) REFERENCES `script`(`id`)
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
