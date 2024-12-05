@@ -39,7 +39,7 @@ const loginUser = asyncHandler(async (req, res) => {
       if (results.length > 0) {
         console.log(results);
         const token = jwt.sign(
-          { email: results[0].email, role: results[0].role },
+          { id: results[0].id, email: results[0].email, role: results[0].role },
           jwtSecret
         );
         res.cookie("token", token, { httpOnly: true });
