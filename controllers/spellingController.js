@@ -28,12 +28,29 @@ const saveScript= async (req, res, next) => {
         console.error("Error inserting script:", error);
         return res.status(500).json({ message: "Internal Server Error" });
       }
+      req.scriptId = results.insertId;
       next();
     });
   };
 
-const spellCheck=(req, res)=>{
+const spellCheck= asyncHandler(async(req, res)=>{
     console.log("spellCheck");
-};
+    const {title, text} = req.body;
+    const scriptId = req.scriptId;
+    const ai = "AI checker" // AI 
+    
+    dbConnect.query('INSERT INTO ai_script (script_id, text) VALUES (?, ?)', [scriptId, ai], function (error, results) {
+        if (error) {
+            console.error("Error inserting script:", error);
+            return res.status(500).json({ message: "Internal Server Error" });
+        }
+        return res.status(200).json({
+            title: title,
+            user: text,
+            ai: ai
+        });
+    });
+    
+});
 
 module.exports ={getSpelling, saveScript, spellCheck}
