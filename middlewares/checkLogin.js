@@ -14,9 +14,8 @@ const checkLogin = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, jwtSecret);
-    req.username = decoded.username;
     console.log("req.username");
-    console.log(decoded.username);
+    console.log(decoded.id);
     next();
   } catch (error) {
     return res.status(401).json({ message: "로그인이 필요합니다." });
