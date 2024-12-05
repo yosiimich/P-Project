@@ -1,0 +1,95 @@
+<!-- 마이 페이지 -->
+<div class="py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- 프로필 섹션 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <!-- 프로필 이미지 -->
+          <div
+            class="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center"
+          >
+            <i class="fas fa-user text-blue-500 text-2xl"></i>
+          </div>
+        </div>
+        <div class="ml-6">
+          <h1 class="text-2xl font-bold text-gray-900">굿플랜트 님</h1>
+          <p class="text-gray-500">굿플랜트 이메일</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메뉴 섹션 -->
+    <div class="grid gap-4">
+      <!-- 기록 보기 -->
+      <a
+        href="/history"
+        class="bg-white rounded-lg shadow-md p-6 hover:bg-gray-50 transition-colors"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div
+              class="h-10 w-10 rounded-md bg-blue-100 flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-history text-blue-500"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-medium text-gray-900">교정 이력</h2>
+              <p class="text-sm text-gray-500">
+                맞춤법/발음 교정 기록을 확인하세요
+              </p>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right text-gray-400"></i>
+        </div>
+      </a>
+
+      <!-- 공지사항 -->
+      <a
+        href="/notice"
+        class="bg-white rounded-lg shadow-md p-6 hover:bg-gray-50 transition-colors"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div
+              class="h-10 w-10 rounded-md bg-blue-100 flex items-center justify-center mr-4"
+            >
+              <i class="fas fa-bullhorn text-blue-500"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-medium text-gray-900">공지사항</h2>
+              <p class="text-sm text-gray-500">
+                서비스 소식과 업데이트 내용을 확인하세요
+              </p>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right text-gray-400"></i>
+        </div>
+      </a>
+
+      <!-- 로그아웃 버튼 -->
+      <button
+        onclick="logout()"
+        class="w-full mt-4 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        로그아웃
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function logout() {
+    if (confirm("로그아웃 하시겠습니까?")) {
+      try {
+        const response = await axios.post("/api/logout");
+        if (response.data.success) {
+          window.location.href = "/";
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+        alert("로그아웃 중 오류가 발생했습니다.");
+      }
+    }
+  }
+</script>
