@@ -7,8 +7,26 @@ const jwtSecret = process.env.JWT_SECRET; // npm i jsonwebtoken
 
 //@desc Get login page
 //@route GET /
-const getMain = (req, res) => {
-  res.render("main");
+const getMain = async (req, res) => {
+  try {
+    // DB에서 핀된 공지사항 가져오기
+    const pinnedNotice = await new Promise((resolve, reject) => {
+      dbConnect.query(
+        "SELECT * FROM notice WHERE pin = 1 ORDER BY created_at DESC LIMIT 1", // 핀된 공지 1개 가져오기
+        [],
+        (error, results) => {
+          if (error) return reject(error);
+          resolve(results.length > 0 ? results[0] : null); // 결과가 없으면 null 반환
+        }
+      );
+    });
+
+    // 공지사항 데이터를 메인 템플릿에 전달
+    res.render("main", { pinnedNotice });
+  } catch (error) {
+    console.error("Error fetching pinned notice:", error);
+    res.render("main", { pinnedNotice: null }); // 핀된 공지사항이 없거나 에러 발생 시 null 전달
+  }
 };
 
 const getNotice = (req, res) => {
