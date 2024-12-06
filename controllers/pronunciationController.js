@@ -71,24 +71,36 @@ const saveS3Pronunciation = asyncHandler(async (req, res, next) => {
             console.error("Error inserting voice:", error);
             return res.status(500).json({ message: "Internal Server Error" });
           }
+          req.voiceId = results.insertId;
           next();
         }
       );
-    
   });
 
 
-  const pronunciationCheck = (req, res) => {
+  const pronunciationCheck =  async (req, res) => {
     const fileUrl = res.locals.fileUrl;
     
     console.log("Pronunciation check started for file:", fileUrl);
-  
+    user = "voice_test_text_user"
+    ai = "voice_test_text_ai"
+    dbConnect.query(
+      "INSERT INTO ai_voice (voice_id, user, ai) VALUES (?, ?, ?)",
+      [req.voiceId, user, ai],
+      function (error, results) {
+        if (error) {
+          console.error("Error inserting voice:", error);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        res.status(200).json({
+          fileUrl: fileUrl,
+          userText: user,
+          aiText: ai,
+        });
+      }
+    );
     // 발음 검사 로직 추가
-    res.status(200).send({
-      message: "Pronunciation check completed!",
-      fileUrl: fileUrl,
-      pronunciationStatus: "Checked", // 실제 로직으로 대체 가능
-    });
+    
   };
 
 module.exports ={getPronunciation, saveS3Pronunciation, savePronunciation, pronunciationCheck}
