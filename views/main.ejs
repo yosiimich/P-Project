@@ -9,24 +9,28 @@
     </p>
   </div>
   <!--이 자리에 공지사항 보여 주기-->
-  <!-- 공지사항 섹션 -->
   <div class="max-w-4xl mx-auto mt-12 px-4">
+    <% if (pinnedNotice) { %>
     <a href="/notice" class="block">
-      <!-- 공지사항 페이지로 연결하는 링크 추가 -->
       <div
         class="bg-white rounded-lg shadow-md p-4 hover:bg-gray-50 transition-colors"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <span class="text-red-500 font-semibold mr-2">[공지]</span>
-            <span class="text-gray-800"
-              >현재 서버 점검 중입니다. (12/15 14:00 ~ 16:00)</span
-            >
+            <span class="text-gray-800"><%= pinnedNotice.title %></span>
           </div>
-          <span class="text-sm text-gray-500">2024.12.15</span>
+          <span class="text-sm text-gray-500">
+            <%= new Date(pinnedNotice.created_at).toLocaleDateString() %>
+          </span>
         </div>
       </div>
     </a>
+    <% } else { %>
+    <div class="bg-white rounded-lg shadow-md p-4 text-center">
+      <p class="text-gray-500">강조된 공지사항이 없습니다.</p>
+    </div>
+    <% } %>
   </div>
 </div>
 

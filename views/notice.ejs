@@ -1,66 +1,41 @@
-<!-- 공지사항 페이지 -->
 <div class="py-8">
   <div class="max-w-4xl mx-auto px-4">
-    <!-- 헤더 부분 -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900">공지사항</h1>
     </div>
 
-    <!-- 공지사항 상세 내용 -->
+    <% if (!notices || notices.length === 0) { %>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+      <p class="text-gray-500">등록된 공지사항이 없습니다.</p>
+    </div>
+    <% } else { %>
+    <!-- 공지사항 목록 -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <!-- 공지 헤더 -->
-      <div class="border-b border-gray-200 p-6">
+      <% notices.forEach((notice, index) => { %>
+      <div
+        class="border-b border-gray-200 p-6 <%= notice.pin ? 'bg-blue-50' : '' %>"
+      >
         <div class="flex items-center mb-4">
+          <% if (notice.pin) { %>
           <span class="text-red-500 font-semibold mr-2">[공지]</span>
-          <h2 class="text-xl font-bold text-gray-900">
-            현재 서버 점검 중입니다.
-          </h2>
+          <% } %>
+          <h2 class="text-xl font-bold text-gray-900"><%= notice.title %></h2>
         </div>
         <div class="flex items-center text-sm text-gray-500">
-          <span class="mr-4">관리자</span>
-          <span>2024.12.15</span>
+          <span class="mr-4"><%= notice.userName || '관리자' %></span>
+          <span><%= new Date(notice.created_at).toLocaleDateString() %></span>
         </div>
-      </div>
-
-      <!-- 공지 내용 -->
-      <div class="p-6">
-        <div class="prose max-w-none">
-          <p class="text-gray-700 leading-relaxed">
-            안녕하세요.<br />
-            서비스 개선을 위한 서버 점검이 진행중입니다.<br /><br />
-
-            [점검 일시]<br />
-            2024년 12월 15일 14:00 ~ 16:00<br /><br />
-
-            [점검 내용]<br />
-            - 시스템 안정성 개선<br />
-            - 신규 기능 추가<br />
-            - 버그 수정<br /><br />
-
-            이용에 불편을 드려 죄송합니다.<br />
-            더 나은 서비스로 찾아뵙겠습니다.
+        <div class="mt-4 prose max-w-none">
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+            <%= notice.context %>
           </p>
         </div>
       </div>
+      <% }); %>
     </div>
+    <% } %>
 
-    <!-- 이전글/다음글 -->
-    <div class="mt-8 space-y-2 border-t border-gray-200 pt-6">
-      <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
-        <span class="text-sm text-gray-500">다음글</span>
-        <a href="#" class="text-gray-900 hover:text-blue-600"
-          >신규 기능 추가 안내</a
-        >
-      </div>
-      <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
-        <span class="text-sm text-gray-500">이전글</span>
-        <a href="#" class="text-gray-900 hover:text-blue-600"
-          >이용 약관 개정 안내</a
-        >
-      </div>
-    </div>
-
-    <!-- 버튼 -->
+    <!-- 홈으로 이동 버튼 -->
     <div class="mt-8 flex justify-center">
       <a
         href="/"
