@@ -1,12 +1,10 @@
 const asyncHandler = require("express-async-handler");
-const crypto = require("crypto");
-require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET;
 const dbConnect = require("../config/dbConnect");
 
-//@desc Get history page
-//@route GET /
+// @desc Get history page
+// @route GET /history
 const getHistory = asyncHandler(async (req, res) => {
   const token = req.cookies.token;
   const decoded = jwt.verify(token, jwtSecret);
@@ -109,64 +107,82 @@ const getHistory = asyncHandler(async (req, res) => {
   }
 });
 
+// 스크립트 세부 정보
 const getScriptHistory = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  dbConnect.query("SELECT * FROM script WHERE id=?",[id],(error, results)=>{
-    if(error){
+  dbConnect.query("SELECT * FROM script WHERE id=?", [id], (error, results) => {
+    if (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    if(results.length==0){
+    if (results.length == 0) {
       return res.status(401).json({ message: "script not found" });
-    }
-    else{
+    } else {
       const script = results[0];
-      dbConnect.query("SELECT * FROM ai_script WHERE script_id=?",[script.id],(error, results)=>{
-        if(error){
+      dbConnect.query("SELECT * FROM ai_script WHERE script_id=?", [script.id], (error, results) => {
+        if (error) {
           return res.status(500).json({ message: "Internal Server Error" });
         }
-        if(results.length==0){
+        if (results.length == 0) {
           return res.status(401).json({ message: "script not found" });
         }
-        const ai_script=results[0];
-        res.status(200).json({
-          id: script.id,
-          title: script.title,
-          text: script.content,
-          aiText: ai_script.text,
-          time: script.created_at
+        const ai_script = results[0];
+        res.render("historyDetail", {
+          title: "맞춤법", // 제목 설정
+          type: "spelling", // 스크립트 타입
+          script: {
+            id: script.id,
+            title: script.title,
+            text: script.content,
+            time: script.created_at,
+            aiScript: {
+              text: ai_script.text,  // ai_script.text 값을 넘겨줍니다.
+            },
+          },
+          layout: "layouts/mainFrame", // 필요한 레이아웃을 추가
         });
-      })
+      });
     }
   });
 });
 
+// 음성 세부 정보
 const getVoiceHistory = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  dbConnect.query("SELECT * FROM voice WHERE id=?",[id],(error, results)=>{
-    if(error){
+  dbConnect.query("SELECT * FROM voice WHERE id=?", [id], (error, results) => {
+    if (error) {
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    if(results.length==0){
-      return res.status(401).json({ message: "script not found" });
-    }
-    else{
+    if (results.length == 0) {
+      return res.status(401).json({ message: "voice not found" });
+    } else {
       const voice = results[0];
-      dbConnect.query("SELECT * FROM ai_voice WHERE voice_id=?",[voice.id],(error, results)=>{
-        if(error){
+      dbConnect.query("SELECT * FROM ai_voice WHERE voice_id=?", [voice.id], (error, results) => {
+        if (error) {
           return res.status(500).json({ message: "Internal Server Error" });
         }
-        if(results.length==0){
-          return res.status(401).json({ message: "script not found" });
+        if (results.length == 0) {
+          return res.status(401).json({ message: "voice not found" });
         }
-        const ai_voice=results[0];
-        res.status(200).json({
-          id: voice.id,
-          url: voice.url,
-          userText: ai_voice.user,
-          aiText: ai_voice.ai,
-          time: voice.created_at,    
+        const ai_voice = results[0];
+
+        const aivoiceText = {
+          user: ai_voice.user,
+          ai: ai_voice.ai
+        };
+        res.render("historyDetail", {
+          title: "발음", // 제목 설정
+          type: "pronunciation", // 발음 타입
+          voiceItem: {
+            id: voice.id,
+            url: voice.url,
+            time: voice.created_at,
+            aiScript: {
+              userText: aivoiceText.user,
+              aiText: aivoiceText.ai,
+          },
+        },
         });
-      })
+      });
     }
   });
 });
