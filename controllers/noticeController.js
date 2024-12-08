@@ -56,4 +56,39 @@ const getAllNotice = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getAllNotice };
+//@desc Get notice Detail page
+//@route GET /
+const getDetailNotice = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  dbConnect.query("SELECT * FROM notice WHERE id=?",[id],(error, results)=>{
+    if(error){
+      console.log(error)
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    if(results.length==0){
+      return res.status(401).json({ message: "notice not found" });
+    }
+    else{
+      const notice = results[0];
+      dbConnect.query("SELECT * FROM users WHERE email=?",[notice.author_email],(error, results)=>{
+        if(error){
+          console.log(error)
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        if(results.length==0){
+          return res.status(401).json({ message: "writer not found" });
+        }
+        const user=results[0];
+        res.status(200).json({
+          id: notice.id,
+          title: notice.title,
+          content: notice.content,
+          created_at: notice.created_at,
+          userName: user.name,
+        });
+      })
+    }
+  });
+});
+
+module.exports = { getAllNotice, getDetailNotice };
