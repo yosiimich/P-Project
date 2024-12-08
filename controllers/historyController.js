@@ -109,4 +109,66 @@ const getHistory = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getHistory };
+const getScriptHistory = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  dbConnect.query("SELECT * FROM script WHERE id=?",[id],(error, results)=>{
+    if(error){
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    if(results.length==0){
+      return res.status(401).json({ message: "script not found" });
+    }
+    else{
+      const script = results[0];
+      dbConnect.query("SELECT * FROM ai_script WHERE script_id=?",[script.id],(error, results)=>{
+        if(error){
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        if(results.length==0){
+          return res.status(401).json({ message: "script not found" });
+        }
+        const ai_script=results[0];
+        res.status(200).json({
+          id: script.id,
+          title: script.title,
+          text: script.content,
+          aiText: ai_script.text,
+          time: script.created_at
+        });
+      })
+    }
+  });
+});
+
+const getVoiceHistory = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  dbConnect.query("SELECT * FROM voice WHERE id=?",[id],(error, results)=>{
+    if(error){
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
+    if(results.length==0){
+      return res.status(401).json({ message: "script not found" });
+    }
+    else{
+      const voice = results[0];
+      dbConnect.query("SELECT * FROM ai_voice WHERE voice_id=?",[voice.id],(error, results)=>{
+        if(error){
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+        if(results.length==0){
+          return res.status(401).json({ message: "script not found" });
+        }
+        const ai_voice=results[0];
+        res.status(200).json({
+          id: voice.id,
+          url: voice.url,
+          userText: ai_voice.user,
+          aiText: ai_voice.ai,
+          time: voice.created_at,    
+        });
+      })
+    }
+  });
+});
+
+module.exports = { getHistory, getScriptHistory, getVoiceHistory };
