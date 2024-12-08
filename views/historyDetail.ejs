@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> 세부 내용</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4"><%= title %> 교정 상세</h1>
+    <div class="border rounded-lg p-6">
+      <% if (type === "spelling") { %>
+        <h2 class="font-medium mb-4"><%= script.title %></h2>
+        <p class="text-sm text-gray-600 mb-4">원문: <%= script.text %></p>
+        <p class="text-sm text-blue-600">교정: <%= script.aiScript.text || '분석 중...' %></p>
+      <% } else if (type === "pronunciation") { %>
+        <audio controls class="w-full mb-4">
+          <source src="<%= voiceItem.url %>" type="audio/mp3" />
+        </audio>
+        <p class="text-sm text-gray-600 mb-4">내용: <%= voiceItem.aiScript.userText %></p>
+        <p class="text-sm text-blue-600">분석: <%= voiceItem.aiScript.aiText %></p>
+      <% } %>
+      <a href="/history" class="text-sm text-blue-600 mt-4 inline-block">목록</a>
+    </div>
+  </div>
+</body>
+</html>
