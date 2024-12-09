@@ -1,0 +1,53 @@
+<!-- 공지사항 상세 내용 -->
+<div class="py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <!-- 헤더 부분 -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">공지사항</h1>
+      </div>
+  
+      <!-- 공지사항 상세 내용 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-900"><%= notice.title %></h2>
+        <div class="flex items-center text-sm text-gray-500 mt-2">
+          <span class="mr-4"><%= userName || '관리자' %></span>
+          <span><%= new Date(notice.created_at).toLocaleDateString() %></span>
+        </div>
+        <hr class="mt-4 border-t-2 border-gray-300">
+        <div class="prose mt-6">
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+            <%= notice.context %> <!-- notice.context 출력 -->
+          </p>
+        </div>
+      </div>
+  
+      <!-- 이전글/다음글 -->
+      <% if (prevNotice || nextNotice) { %>  <!-- 이전글 또는 다음글이 있을 때만 이 영역을 출력 -->
+        <div class="mt-8 space-y-2 border-t border-gray-200 pt-6">
+          <% if (prevNotice) { %>
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
+              <span class="text-sm text-gray-500">이전글</span>
+              <a href="/notice/<%= prevNotice.id %>" class="text-gray-900 hover:text-blue-600"><%= prevNotice.title %></a>
+            </div>
+          <% } %>
+    
+          <% if (nextNotice) { %>
+            <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-50">
+              <span class="text-sm text-gray-500">다음글</span>
+              <a href="/notice/<%= nextNotice.id %>" class="text-gray-900 hover:text-blue-600"><%= nextNotice.title %></a>
+            </div>
+          <% } %>
+        </div>
+        <% } %> <!-- 이전글, 다음글 영역 끝 -->
+  
+        <!-- 버튼 -->
+        <div class="mt-8 flex justify-center">
+          <a
+            href="/notice"
+            class="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          >
+            목록
+          </a>
+        </div>
+      </div>
+    </div>
