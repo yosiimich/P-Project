@@ -4,6 +4,8 @@ const crypto = require("crypto");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const jwtSecret = process.env.JWT_SECRET; // npm i jsonwebtoken
+const {jwt_sign} = require("../config/jwt-util");
+
 
 //@desc Get login page
 //@route GET /
@@ -56,16 +58,30 @@ const loginUser = asyncHandler(async (req, res) => {
     function (error, results) {
       if (error) {
         console.error("Error reading users:", error);
-        return res.status(500).json({ message: "Internal Server Error" });
+        res.status(500).json({ message: "Internal Server Error" });
       }
-      if (results.length > 0) {
+
+      if (results.length > 0 ) {
+        jwt_sign(results[0]).then(tokens => {
+          console.log("Access token:", tokens);
+          res.cookie("token", tokens.token, { 
+            httpOnly: true,
+            maxAge: 24*60*60*1000, });
+          res.cookie("refreshToken", tokens.refresh, {
+            httpOnly: true, // JavaScript에서 접근 불가
+            maxAge: 365 * 24 * 60 * 60 * 1000, // 1년 (밀리초 단위)
+          });
+          const token = tokens.token
+          return res.status(200).json({ message: "Login successful",  token});
+        }).catch(error => {
+          console.error("Error:", error);
+          return res
+          .status(401)
+          .json({ message: "JWT Token error" });
+        });
+        
         console.log(results);
-        const token = jwt.sign(
-          { id: results[0].id, email: results[0].email, role: results[0].role },
-          jwtSecret
-        );
-        res.cookie("token", token, { httpOnly: true });
-        return res.status(200).json({ message: "Login successful", token });
+        
       } else {
         console.log("User not found");
         return res
@@ -83,7 +99,7 @@ const logout = (req, res) => {
 
   const token = req.cookies.token;
   if (!token) {
-    return res.status(400).json({ message: "No token found" });
+    res.status(400).json({ message: "No token found" });
   }
 
   res.clearCookie("token", { httpOnly: true });

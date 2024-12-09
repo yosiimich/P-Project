@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret = process.env.JWT_SECRET;
-
+const {_,jwt_refresh} = require("../config/jwt-util");
 // 로그인 필수 체크
 const checkLogin = async (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -30,6 +30,8 @@ const checkUser = async (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, jwtSecret);
+      const refreshToken = req.cookies.refreshToken;
+      jwt_refresh(refreshToken);
       res.locals.user = decoded;
     } catch (error) {
       res.locals.user = null;
