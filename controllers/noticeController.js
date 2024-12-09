@@ -57,38 +57,67 @@ const getAllNotice = asyncHandler(async (req, res) => {
 });
 
 //@desc Get notice Detail page
-//@route GET /
+//@route GET /:id
 const getDetailNotice = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  dbConnect.query("SELECT * FROM notice WHERE id=?",[id],(error, results)=>{
-    if(error){
-      console.log(error)
+
+  // 현재 공지사항 정보 가져오기
+  dbConnect.query("SELECT * FROM notice WHERE id=?", [id], (error, results) => {
+    if (error) {
+      console.log(error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
-    if(results.length==0){
-      return res.status(401).json({ message: "notice not found" });
+  
+    if (results.length == 0) {
+      return res.status(401).json({ message: "Notice not found" });
     }
-    else{
-      const notice = results[0];
-      dbConnect.query("SELECT * FROM users WHERE email=?",[notice.author_email],(error, results)=>{
-        if(error){
-          console.log(error)
+  
+    const notice = results[0];
+  
+    // 작성자 정보 가져오기
+    dbConnect.query("SELECT * FROM users WHERE email=?", [notice.author_email], (error, results) => {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+  
+      if (results.length == 0) {
+        return res.status(401).json({ message: "Writer not found" });
+      }
+  
+      const user = results[0];
+  
+      // 이전글과 다음글 가져오기
+      dbConnect.query("SELECT * FROM notice WHERE id < ? ORDER BY id DESC LIMIT 1", [id], (error, prevResults) => {
+        if (error) {
+          console.log(error);
           return res.status(500).json({ message: "Internal Server Error" });
         }
-        if(results.length==0){
-          return res.status(401).json({ message: "writer not found" });
-        }
-        const user=results[0];
-        res.status(200).json({
-          id: notice.id,
-          title: notice.title,
-          content: notice.content,
-          created_at: notice.created_at,
-          userName: user.name,
+  
+        const prevNotice = prevResults.length > 0 ? prevResults[0] : null;
+  
+        dbConnect.query("SELECT * FROM notice WHERE id > ? ORDER BY id ASC LIMIT 1", [id], (error, nextResults) => {
+          if (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Internal Server Error" });
+          }
+  
+          const nextNotice = nextResults.length > 0 ? nextResults[0] : null;
+  
+          // 공지사항과 작성자 정보를 렌더링
+          res.render("noticeDetail", {
+            notice: notice,
+            userName: user.name,
+            prevNotice: prevNotice,  // 이전글 정보
+            nextNotice: nextNotice,  // 다음글 정보
+            layout: "layouts/mainFrame"  // 레이아웃 설정 (옵션)
+          });
         });
-      })
-    }
-  });
+      });
+    });
+  });  
 });
+
+
 
 module.exports = { getAllNotice, getDetailNotice };
