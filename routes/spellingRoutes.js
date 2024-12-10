@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { getSpelling, saveScript, spellCheck } = require("../controllers/spellingController");
+const { getSpelling, saveScript, saveFile, spellCheck } = require("../controllers/spellingController");
 
-router.route("/").get(getSpelling).post(saveScript, spellCheck);
+router.route("/").get(getSpelling).post(saveScript, saveFile, spellCheck);
 
 
 module.exports = router;
