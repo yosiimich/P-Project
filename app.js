@@ -32,6 +32,7 @@ app.use("/mine", require("./routes/mineRoutes"));
 app.use("/spell", require("./routes/spellingRoutes"));
 app.use("/pronunciation", require("./routes/pronunciationRoutes"));
 app.use("/notice", require("./routes/noticeRoutes"));
+app.use("/admin", require("./routes/adminRoutes"));
 
 app.listen(port, () => {
   console.log(`${port}번 포트에서 서버 실행 중`);
