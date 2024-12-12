@@ -68,14 +68,14 @@ const saveS3Pronunciation = asyncHandler(async (req, res, next) => {
 
 const savePronunciation = asyncHandler(async (req, res, next) => {
   const fileUrl = res.locals.fileUrl;
-
+  const {title, text} = req.body;
   const token = req.cookies.token;
   const decoded = jwt.verify(token, jwtSecret);
   const email = decoded.email;
 
   dbConnect.query(
-    "INSERT INTO voice (author_email, url) VALUES (?, ?)",
-    [email, fileUrl],
+    "INSERT INTO voice (author_email, url, script) VALUES (?, ?, ?)",
+    [email, fileUrl, text],
     function (error, results) {
       if (error) {
         console.error("Error inserting voice:", error);
@@ -89,13 +89,13 @@ const savePronunciation = asyncHandler(async (req, res, next) => {
 
 const pronunciationCheck = async (req, res) => {
   const fileUrl = res.locals.fileUrl;
+  const {title, text} = req.body;
 
   console.log("Pronunciation check started for file:", fileUrl);
-  user = "voice_test_text_user";
   ai = "voice_test_text_ai";
   dbConnect.query(
-    "INSERT INTO ai_voice (voice_id, user, ai) VALUES (?, ?, ?)",
-    [req.voiceId, user, ai],
+    "INSERT INTO ai_voice (voice_id, ai) VALUES (?, ?)",
+    [req.voiceId, ai],
     function (error, results) {
       if (error) {
         console.error("Error inserting voice:", error);
@@ -103,7 +103,7 @@ const pronunciationCheck = async (req, res) => {
       }
       res.status(200).json({
         fileUrl: fileUrl,
-        userText: user,
+        userText: text,
         aiText: ai,
       });
     }
