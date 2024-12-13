@@ -58,39 +58,37 @@ const loginUser = asyncHandler(async (req, res) => {
     function (error, results) {
       if (error) {
         console.error("Error reading users:", error);
-        res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: "Internal Server Error" });
       }
 
-      if (results.length > 0 ) {
-        jwt_sign(results[0]).then(tokens => {
-          console.log("Access token:", tokens);
-          res.cookie("token", tokens.token, { 
-            httpOnly: true,
-            maxAge: 24*60*60*1000, });
-          res.cookie("refreshToken", tokens.refresh, {
-            httpOnly: true, // JavaScript에서 접근 불가
-            maxAge: 365 * 24 * 60 * 60 * 1000, // 1년 (밀리초 단위)
+      if (results.length > 0) {
+        const user = results[0];
+
+        jwt_sign(user)
+          .then((tokens) => {
+            // 관리자와 일반 사용자 리다이렉션 경로 설정
+            const redirectUrl = user.role === 1 ? "/admin" : "/";
+            console.log("Redirect URL:", redirectUrl); // 리다이렉션 경로 확인
+
+            // JWT 토큰을 쿠키로 설정
+            res.cookie("token", tokens.token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+            res.cookie("refreshToken", tokens.refresh, { httpOnly: true, maxAge: 365 * 24 * 60 * 60 * 1000 });
+
+            // 클라이언트로 응답
+            return res.status(200).json({ message: "Login successful", redirect: redirectUrl });
+          })
+          .catch((err) => {
+            console.error("Error signing JWT:", err);
+            res.status(500).json({ message: "Internal Server Error" });
           });
-          const token = tokens.token
-          return res.status(200).json({ message: "Login successful",  token});
-        }).catch(error => {
-          console.error("Error:", error);
-          return res
-          .status(401)
-          .json({ message: "JWT Token error" });
-        });
-        
-        console.log(results);
-        
       } else {
-        console.log("User not found");
-        return res
-          .status(401)
-          .json({ message: "Invalid username or password" });
+        res.status(401).json({ message: "Invalid username or password" });
       }
     }
   );
 });
+
+
 
 // @desc Logout
 // @route GET /logout
