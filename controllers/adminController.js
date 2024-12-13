@@ -245,6 +245,9 @@ const getANotice = async(req,res) =>{
     );
 }
 
+const makeNotice = (req,res) =>{
+  res.render('make-notice')//
+}
 
 const postNotice = async(req,res) =>{
   console.log("get all notice info");
@@ -313,26 +316,6 @@ const deleteNotice = async(req,res)=>{
 }
 
 
-
-
-module.exports = {
-  getAdmin,
-  getusers,
-  deleteUser,
-  getScript,
-  deleteScript,
-  getVoice,
-  deleteVoice,
-  getNotice,
-  getANotice,
-  postNotice,
-  putNotice,
-  deleteNotice
-};
-
-
-
-
 module.exports = {
     getAdmin,
     getusers,
@@ -343,6 +326,7 @@ module.exports = {
     deleteVoice,
     getNotice,
     getANotice,
+    makeNotice,
     postNotice,
     putNotice,
     deleteNotice
