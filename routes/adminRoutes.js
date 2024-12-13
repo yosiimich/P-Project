@@ -14,6 +14,7 @@ router.route("/voice").get(getVoice)
 router.route("/voice/:id").delete(deleteVoice);
 router.route("/notice").get(getNotice)
 router.route("/notice/make").get(makeNotice).post(postNotice);
-router.route("/notice/:id").get(getANotice).put(putNotice).delete(deleteNotice);
+router.route("/notice/:id").get(getANotice).post(putNotice).delete(deleteNotice);
+
 
 module.exports = router;

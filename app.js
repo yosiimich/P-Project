@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(checkUser);
 
-app.use(methodOverride((req, res) => req.body._method));
+app.use(methodOverride("_method"));
 
 app.use("/", require("./routes/loginRoutes"));
 app.use("/history", require("./routes/historyRoutes"));

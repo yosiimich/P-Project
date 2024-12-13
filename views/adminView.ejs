@@ -47,10 +47,9 @@
                 <td><%= user.email %></td>
                 <td><%= user.role %></td>
                 <td>
-                    <form action="/admin/user/<%= user.id %>" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
-                    <input type="hidden" name="_method" value="DELETE" />  <!-- 실제로 DELETE 요청으로 전환 -->
-                    <button type="submit" class="text-red-600 hover:underline">삭제</button>
-                    </form>
+                    <form action="/admin/user/<%= user.id %>?_method=DELETE" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
+                        <button type="submit" class="text-red-600 hover:underline">삭제</button>
+                      </form>
                 </td>
                 </tr>
             <% }); %>
@@ -89,10 +88,9 @@
                 <td><%= script.text %></td>
                 <td><%= script.time %></td>
                 <td>
-                    <form action="/admin/script/<%= script.id %>" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
-                    <input type="hidden" name="_method" value="DELETE" />  <!-- 실제로 DELETE 요청으로 전환 -->
-                    <button type="submit" class="text-red-600 hover:underline">삭제</button>
-                    </form>
+                    <form action="/admin/script/<%= script.id %>?_method=DELETE" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
+                        <button type="submit" class="text-red-600 hover:underline">삭제</button>
+                      </form>
                 </td>
                 </tr>
             <% }); %>
@@ -133,10 +131,9 @@
                 <td><%= voice.aiScript.userText %></td>
                 <td><%= voice.aiScript.aiText %></td>
                 <td>
-                    <form action="/admin/voice/<%= voice.id %>" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
-                    <input type="hidden" name="_method" value="DELETE" />  <!-- 실제로 DELETE 요청으로 전환 -->
-                    <button type="submit" class="text-red-600 hover:underline">삭제</button>
-                    </form>
+                    <form action="/admin/voice/<%= voice.id %>?_method=DELETE" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
+                        <button type="submit" class="text-red-600 hover:underline">삭제</button>
+                      </form>
                 </td>
                 </tr>
             <% }); %>
@@ -170,21 +167,20 @@
             <% if (results.length > 0) { %>
             <% results.forEach(function(result) { %>
                 <tr>
-                <td><a href="/admin/notice/<%= result.id %>" class="text-blue-500 hover:underline"><%= result.title %></a></td>
+                <td><%= result.title %></a></td>
                 <td><%= result.created_at %></td>
                 <td><%= result.pin ? '핀 고정' : '일반' %></td>
                 <td>
-                    <form action="/admin/notice/<%= result.id %>" method="POST">
-                    <input type="hidden" name="_method" value="PUT" />
+                    <form action="/admin/notice/<%= result.id %>" method="PUT">
                     <button type="submit" class="text-red-600 hover:underline">수정</button>
                     </form>
                 </td>
                 <td>
-                    <form action="/admin/notice/<%= result.id %>" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
-                    <input type="hidden" name="_method" value="DELETE" />
-                    <button type="submit" class="text-red-600 hover:underline">삭제</button>
+                    <form action="/admin/notice/<%= result.id %>?_method=DELETE" method="POST" onsubmit="if(confirm('정말로 삭제하시겠습니까?')==false) return false;">
+                      <button type="submit" class="text-red-600 hover:underline">삭제</button>
                     </form>
-                </td>
+                  </td>
+                  
                 </tr>
             <% }); %>
             <% } else { %>
@@ -195,7 +191,7 @@
             <!-- 생성 버튼이 포함된 행 추가 -->
             <tr>
             <td colspan="5" class="text-center">
-                <form action="/admin/notice" method="POST">
+                <form action="/admin/notice/make" method="GET">
                 <button type="submit" class="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-600 transition">공지사항 생성</button>
                 </form>
             </td>

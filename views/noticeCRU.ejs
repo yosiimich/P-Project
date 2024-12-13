@@ -13,50 +13,19 @@
   </style>
 </head>
 <body>
-  <% if (title === "공지사항 상세") { %>
-  <div id="notice-detail-section" class="section max-w-4xl mx-auto mt-10 px-4">
-    <h2 class="text-2xl font-semibold text-gray-900 mb-4">공지사항 상세</h2>
-    <% if (results.length > 0) { %>
-      <% results.forEach(function (result) { %>
-        <div class="bg-white p-6 rounded shadow-md">
-          <h3 class="text-xl font-bold mb-4"><%= result.title %></h3>
-          <p class="text-gray-600 mb-4">작성자: <%= result.author_email %></p>
-          <p class="text-gray-600 mb-4">작성일: <%= result.created_at %></p>
-          <div class="mb-6">
-            <div class="mt-4 prose max-w-none border-t border-gray-300">
-              <p class="text-gray-700 leading-relaxed whitespace-pre-line">
-                <%= result.content %>
-              </p>
-            </div>
-          </div>       
-          <p><strong>고정 여부:</strong> <%= result.pin ? '핀 고정' : '일반' %></p>
-        </div>
-      <% }); %>
-    <% } else { %>
-      <p class="text-center">해당 공지사항을 찾을 수 없습니다.</p>
-    <% } %>
-    <div class="mt-4 text-center">
-      <a href="/admin/notice">
-        <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">공지사항 목록으로 돌아가기</button>
-      </a>
-    </div>
-  </div>
-  <% } else if (title === "공지사항 수정") { %>
+  <% if (title === "공지사항 수정") { %>
     <div class="max-w-4xl mx-auto p-6">
       <h1 class="text-2xl font-semibold text-gray-900 mb-4">공지사항 수정</h1>
-      <form action="/admin/notice/<%= results.id %>" method="POST" >
-        <input type="hidden" name="_method" value="PUT" />  <!-- PUT 요청으로 전환 -->
-        
+      <form action="/admin/notice/<%= results.id %>" method="POST">
+        <input type="hidden" name="_method" value="PUT">
         <div class="mb-4">
           <label for="title" class="block text-lg font-medium text-gray-700">제목</label>
           <input type="text" id="title" name="title" value="<%= results.title %>" class="mt-1 p-2 border border-gray-300 rounded w-full" required>
         </div>
-        
         <div class="mb-4">
           <label for="content" class="block text-lg font-medium text-gray-700">내용</label>
           <textarea id="content" name="content" rows="6" class="mt-1 p-2 border border-gray-300 rounded w-full" required><%= results.content %></textarea>
         </div>
-        
         <div class="mb-4">
           <label for="pin" class="block text-lg font-medium text-gray-700">고정 여부</label>
           <select id="pin" name="pin" class="mt-1 p-2 border border-gray-300 rounded w-full">
@@ -64,11 +33,11 @@
             <option value="false" <%= !results.pin ? 'selected' : '' %>>일반</option>
           </select>
         </div>
-  
         <div class="mt-4 text-center">
           <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">수정 완료</button>
         </div>
       </form>
+      
   
       <div class="mt-4 text-center">
         <a href="/admin/notice">
@@ -78,16 +47,14 @@
     </div>
   <% } else if (title === "공지사항 생성") { %>
     <div class="max-w-4xl mx-auto p-6">
-      <h1 class="text-2xl font-semibold text-gray-900 mb-4">공지사항 생성</h1>
-      <form action="/admin/notice" method="POST">
-               
+      <form action="/admin/notice/make" method="POST">
         <div class="mb-4">
           <label for="title" class="block text-lg font-medium text-gray-700">제목</label>
           <input type="text" id="title" name="title" class="mt-1 p-2 border border-gray-300 rounded w-full" required>
         </div>
         
         <div class="mb-4">
-          <label for="context" class="block text-lg font-medium text-gray-700">내용</label>
+          <label for="content" class="block text-lg font-medium text-gray-700">내용</label>
           <textarea id="content" name="content" rows="6" class="mt-1 p-2 border border-gray-300 rounded w-full" required></textarea>
         </div>
         
@@ -98,13 +65,11 @@
             <option value="false">일반</option>
           </select>
         </div>
-  
+      
         <div class="mt-4 text-center">
           <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">생성 완료</button>
-        </a>
-      </div>
+        </div>
       </form>
-  
       <div class="mt-4 text-center">
         <a href="/admin/notice">
           <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition">돌아가기</button>
