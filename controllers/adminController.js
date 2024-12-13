@@ -236,7 +236,7 @@ const getANotice = async(req,res) =>{
         }
   
         if (results.length > 0) {
-          return res.render("noticeCRU", { results, title: "공지사항 상세" });
+          return res.render("noticeCRU", { results: results[0], title: "공지사항 수정" });
         } else {
           console.log("Notice not found");
           return res.status(404).json({ message: "Notice not found" });
@@ -245,6 +245,9 @@ const getANotice = async(req,res) =>{
     );
 }
 
+const makeNotice = async(req,res) =>{
+  res.render('noticeCRU', { title: "공지사항 생성" })
+}
 
 const postNotice = async(req,res) =>{
   console.log("get all notice info");
@@ -262,34 +265,34 @@ const postNotice = async(req,res) =>{
           console.error("Error make notice:", error);
           return res.status(500).json({ message: "Internal Server Error" });
         }
-          return res.render("noticeCRU", { results, title: "공지사항 생성" });
+        res.redirect("/admin/notice");
       }
     );
 }
 
-const putNotice = async(req,res) =>{
+const putNotice = async(req,res) => {
   console.log("get put notice info");
   const id = req.params.id;
-  const {title, content,pin} = req.body
+  const { title, content, pin } = req.body;
   console.log(req.body);
-  const email = "admin123@gmail.com"
-  let boolPin = false
+  const email = "admin123@gmail.com";
+  let boolPin = pin === "true" ? true : false;
 
-  if(pin ==="true"){
-      boolPin=true;
-  }
   dbConnect.query(
-      "UPDATE notice SET author_email=?, title=?, content=?, pin=?",[email, title, content, boolPin],
-      function (error, results) {
-        if (error) {
-          console.error("Error update notice:", error);
-          return res.status(500).json({ message: "Internal Server Error" });
-        } 
-          return res.render("noticeCRU", { results, title: "공지사항 수정" });
-           
+    "UPDATE notice SET author_email=?, title=?, content=?, pin=? WHERE id=?",
+    [email, title, content, boolPin, id],
+    function (error, results) {
+      if (error) {
+        console.error("Error update notice:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
       }
-    );
+
+      // 수정 완료 후 공지사항 관리 페이지로 리다이렉트
+      res.redirect("/admin/notice");
+    }
+  );
 }
+
 
 const deleteNotice = async(req,res)=>{
   const id = req.params.id;
@@ -325,25 +328,8 @@ module.exports = {
   deleteVoice,
   getNotice,
   getANotice,
+  makeNotice,
   postNotice,
   putNotice,
   deleteNotice
-};
-
-
-
-
-module.exports = {
-    getAdmin,
-    getusers,
-    deleteUser,
-    getScript,
-    deleteScript,
-    getVoice,
-    deleteVoice,
-    getNotice,
-    getANotice,
-    postNotice,
-    putNotice,
-    deleteNotice
 };
