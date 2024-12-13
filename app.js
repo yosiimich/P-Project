@@ -17,7 +17,6 @@ app.set("layout", "layouts/mainFrame"); // 추가
 app.set("layout extractScripts", true); // 추가 (스크립트 추출 설정
 
 app.use(express.static("./public"));
-app.use(methodOverride("_method"));
 app.use(cookieParser());
 
 const port = process.env.PORT;
@@ -25,6 +24,8 @@ const port = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(checkUser);
+
+app.use(methodOverride((req, res) => req.body._method));
 
 app.use("/", require("./routes/loginRoutes"));
 app.use("/history", require("./routes/historyRoutes"));
