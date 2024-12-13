@@ -42,4 +42,27 @@ const checkUser = async (req, res, next) => {
   next();
 };
 
-module.exports = { checkLogin, checkUser };
+const checkAdmin = async (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+
+    if (decoded.role !== 1) {
+      // 관리자 권한이 없으면 메인 페이지로 리디렉션
+      return res.redirect("/");
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.redirect("/login");
+  }
+};
+
+module.exports = { checkLogin, checkUser, checkAdmin };
