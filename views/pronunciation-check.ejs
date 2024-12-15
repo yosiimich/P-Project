@@ -1,35 +1,135 @@
 <div class="max-w-6xl mx-auto px-4 py-6">
   <h1 class="text-2xl font-bold text-gray-900 mb-6">발음 분석 결과</h1>
 
-  <div class="grid grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- 음성 재생 부분 -->
+    <div class="bg-white shadow rounded-lg p-6 md:col-span-2">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">녹음된 음성</h2>
+      <audio id="audio-player" controls class="w-full">
+        <source id="audio-source" src="" type="audio/mp3" />
+        브라우저가 오디오 재생을 지원하지 않습니다.
+      </audio>
+    </div>
+
     <!-- 사용자 발음 -->
     <div class="bg-white shadow rounded-lg p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">내 발음</h2>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">스크립트</h2>
+      <div id="user-text" class="p-4 bg-gray-50 rounded-md mb-4">
+        <!-- 사용자가 입력한 텍스트가 여기에 표시됩니다 -->
+      </div>
       <div class="space-y-4">
         <div class="p-4 bg-gray-50 rounded-md">
-          <p class="text-lg font-mono">/hʌloʊ/</p>
-          <p class="text-sm text-gray-500 mt-2">실제 발음: /hɛloʊ/</p>
-        </div>
-        <div class="p-4 bg-gray-50 rounded-md">
-          <p class="text-lg font-mono">/wɜrld/</p>
-          <p class="text-sm text-gray-500 mt-2">실제 발음: /wɝːld/</p>
+          <h3 class="text-md font-medium text-gray-700 mb-2">실제 발음 결과</h3>
+          <div id="user-pronunciation" class="text-sm text-gray-600">
+            <!-- 사용자 발음 분석 결과가 여기에 표시됩니다 -->
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 정확한 발음 -->
+    <!-- AI 분석 결과 -->
     <div class="bg-white shadow rounded-lg p-6">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">정확한 발음</h2>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">AI 피드백</h2>
       <div class="space-y-4">
         <div class="p-4 bg-blue-50 rounded-md">
-          <p class="text-lg font-mono text-blue-600">/hɛloʊ/</p>
-          <p class="text-sm text-blue-500 mt-2">hello</p>
-        </div>
-        <div class="p-4 bg-blue-50 rounded-md">
-          <p class="text-lg font-mono text-blue-600">/wɝːld/</p>
-          <p class="text-sm text-blue-500 mt-2">world</p>
+          <h3 class="text-md font-medium text-blue-700 mb-2">발음 교정 사항</h3>
+          <div id="ai-feedback" class="text-sm text-blue-600">
+            <!-- AI 피드백이 여기에 표시됩니다 -->
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // URL 파라미터 디버깅
+    console.log("Full URL:", window.location.href);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const audioUrl = urlParams.get("url");
+    const userText = urlParams.get("userText"); // 'user' 대신 'userText'로 수정
+    const aiText = urlParams.get("aiText"); // 'ai' 대신 'aiText'로 수정
+
+    console.log("Received params:", { audioUrl, userText, aiText });
+
+    const compareAndHighlight = (original, pronounced) => {
+      const originalWords = original.split(" ");
+      const pronouncedWords = pronounced.split(" ");
+      let result = "";
+
+      pronouncedWords.forEach((word, i) => {
+        if (word !== originalWords[i]) {
+          result += `<span class="text-red-500 font-medium">${word}</span> `;
+        } else {
+          result += word + " ";
+        }
+      });
+
+      return result.trim();
+    };
+
+    // 오디오 플레이어 설정
+    if (audioUrl) {
+      const decodedUrl = decodeURIComponent(audioUrl);
+      console.log("Audio URL:", decodedUrl);
+      const audioPlayer = document.getElementById("audio-player");
+      audioPlayer.src = decodedUrl;
+    } else {
+      console.log("No audio URL provided");
+    }
+
+    // 스크립트 표시
+    if (userText) {
+      const userTextElement = document.getElementById("user-text");
+      const decodedUserText = decodeURIComponent(userText);
+      console.log("Decoded user text:", decodedUserText);
+      userTextElement.textContent = decodedUserText;
+    } else {
+      console.log("No user text provided");
+    }
+
+    // 발음 분석 결과 표시
+    if (aiText && userText) {
+      console.log("Processing AI and user text comparison");
+      const userPronunciationElement =
+        document.getElementById("user-pronunciation");
+      const originalText = decodeURIComponent(userText);
+      const pronouncedText = decodeURIComponent(aiText);
+
+      console.log("Comparing:", { originalText, pronouncedText });
+
+      userPronunciationElement.innerHTML = `
+      <div class="text-base">
+        ${compareAndHighlight(originalText, pronouncedText)}
+      </div>
+      <p class="text-xs text-gray-500 mt-2">* 빨간색으로 표시된 부분이 원본 스크립트와 다르게 발음된 부분입니다.</p>
+    `;
+
+      const aiFeedbackElement = document.getElementById("ai-feedback");
+      const differences = [];
+
+      originalText.split(" ").forEach((originalWord, index) => {
+        const pronouncedWord = pronouncedText.split(" ")[index];
+        if (originalWord !== pronouncedWord) {
+          differences.push(`"${originalWord}" → "${pronouncedWord}"`);
+        }
+      });
+
+      console.log("Found differences:", differences);
+
+      aiFeedbackElement.innerHTML = `
+      <div class="space-y-2">
+        <p class="font-medium">교정이 필요한 발음:</p>
+        <ul class="list-disc pl-5">
+          ${differences.map((diff) => `<li>${diff}</li>`).join("")}
+        </ul>
+        <p class="mt-4 text-sm">정확한 발음을 위해 천천히 또박또박 읽어보세요.</p>
+      </div>
+    `;
+    } else {
+      console.log("Missing either AI text or user text");
+    }
+  });
+</script>
