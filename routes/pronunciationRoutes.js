@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
   getPronunciation,
-  saveS3Pronunciation,
+  saveAndUpload,
   savePronunciation,
   pronunciationCheck,
 } = require("../controllers/pronunciationController");
@@ -10,6 +10,6 @@ const {
 router
   .route("/")
   .get(getPronunciation)
-  .post(saveS3Pronunciation, savePronunciation, pronunciationCheck);
+  .post(saveAndUpload, savePronunciation, pronunciationCheck);
 
 module.exports = router;
