@@ -102,6 +102,6 @@ ALTER TABLE `users`
 ADD COLUMN `refreshToken` VARCHAR(255) DEFAULT NULL;
 
 ALTER TABLE `voice`
-ADD COLUMN `script` TEXT NOT NULL;
+ADD COLUMN `script` TEXT;
 
 ALTER TABLE `ai_voice` DROP COLUMN `user`;
