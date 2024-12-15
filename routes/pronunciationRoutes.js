@@ -5,6 +5,7 @@ const {
   saveAndUpload,
   savePronunciation,
   pronunciationCheck,
+  getPronunciationResult,
 } = require("../controllers/pronunciationController");
 
 router
@@ -12,4 +13,5 @@ router
   .get(getPronunciation)
   .post(saveAndUpload, savePronunciation, pronunciationCheck);
 
+router.get("/result", getPronunciationResult);
 module.exports = router;

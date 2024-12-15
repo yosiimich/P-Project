@@ -1,3 +1,4 @@
+<!-- views/spelling-check.ejs -->
 <div class="max-w-4xl mx-auto px-4 py-6">
   <h1 class="text-2xl font-bold text-gray-900 mb-6">맞춤법 검사</h1>
 
@@ -72,22 +73,78 @@
           text: text,
         });
 
+        // 정밀한 차이점 표시 함수
+        const 정밀비교 = (원본, 수정본) => {
+          let result = "";
+          let i = 0;
+          let j = 0;
+
+          while (i < 원본.length && j < 수정본.length) {
+            if (원본[i] === 수정본[j]) {
+              result += 원본[i];
+              i++;
+              j++;
+            } else {
+              // 현재 글자가 다른 경우, 단어의 끝까지 찾아서 비교
+              let 원본단어끝 = i;
+              let 수정단어끝 = j;
+
+              while (원본단어끝 < 원본.length && !/\s/.test(원본[원본단어끝]))
+                원본단어끝++;
+              while (
+                수정단어끝 < 수정본.length &&
+                !/\s/.test(수정본[수정단어끝])
+              )
+                수정단어끝++;
+
+              // 틀린 부분만 빨간색으로 표시
+              const 원본단어 = 원본.slice(i, 원본단어끝);
+              const 수정단어 = 수정본.slice(j, 수정단어끝);
+
+              // 글자 단위로 비교하여 다른 부분만 하이라이트
+              for (
+                let k = 0;
+                k < Math.max(원본단어.length, 수정단어.length);
+                k++
+              ) {
+                if (원본단어[k] !== 수정단어[k]) {
+                  result += `<span class="text-red-500 font-medium">${
+                    수정단어[k] || ""
+                  }</span>`;
+                } else {
+                  result += 수정단어[k];
+                }
+              }
+
+              i = 원본단어끝;
+              j = 수정단어끝;
+            }
+          }
+
+          // 남은 텍스트 처리
+          if (j < 수정본.length) {
+            result += 수정본.slice(j);
+          }
+
+          return result;
+        };
+
         resultContent.innerHTML = `
-      <div class="mb-4">
-        <h3 class="font-medium">원본 텍스트:</h3>
-        <p class="mt-2">${response.data.user}</p>
-      </div>
-      <div class="mb-4">
-        <h3 class="font-medium">검사 결과:</h3>
-        <p class="mt-2">${response.data.ai}</p>
-      </div>
-    `;
+        <div class="mb-4">
+          <h3 class="font-medium">원본 텍스트:</h3>
+          <p class="mt-2">${response.data.user}</p>
+        </div>
+        <div class="mb-4">
+          <h3 class="font-medium">검사 결과:</h3>
+          <p class="mt-2">${정밀비교(response.data.user, response.data.ai)}</p>
+        </div>
+      `;
       } catch (error) {
         resultContent.innerHTML = `
-      <div class="text-red-500">
-        맞춤법 검사 중 오류가 발생했습니다. 다시 시도해주세요.
-      </div>
-    `;
+        <div class="text-red-500">
+          맞춤법 검사 중 오류가 발생했습니다. 다시 시도해주세요.
+        </div>
+      `;
         console.error("Error:", error);
       }
     });
