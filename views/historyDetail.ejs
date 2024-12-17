@@ -1,42 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= title %> 세부 내용</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body class="bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 py-8">
-      <div class="mb-6 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900"><%= title %> 교정 상세</h1>
-        <a
-          href="/history"
-          class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center"
-        >
-          <svg
-            class="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          목록으로 돌아가기
-        </a>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> 세부 내용</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="mb-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-900"><%= title %> 교정 상세</h1>
+      <a href="/history" class="text-sm text-blue-600 hover:text-blue-800 transition-colors flex items-center">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        목록으로 돌아가기
+      </a>
+    </div>
 
-      <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <% if (type === "spelling") { %>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <% if (type === "spelling") { %>
         <div class="p-6">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">
-            <%= script.title %>
-          </h2>
+          <h2 class="text-xl font-semibold text-gray-800 mb-4"><%= script.title %></h2>
           <div class="space-y-6">
             <div class="bg-gray-50 rounded-lg p-4">
               <h3 class="text-sm font-medium text-gray-500 mb-2">원문</h3>
@@ -44,13 +29,11 @@
             </div>
             <div class="bg-blue-50 rounded-lg p-4">
               <h3 class="text-sm font-medium text-blue-600 mb-2">교정 결과</h3>
-              <p class="text-blue-800">
-                <%= script.aiScript.text || '분석 중...' %>
-              </p>
+              <p class="text-blue-800"><%= script.aiScript.text || '분석 중...' %></p>
             </div>
           </div>
         </div>
-        <% } else if (type === "pronunciation") { %>
+      <% } else if (type === "pronunciation") { %>
         <div class="p-6">
           <% console.log("Voice Item Data:", voiceItem); %>
           <div class="mb-6">
@@ -68,15 +51,13 @@
               <p class="text-gray-800"><%= voiceItem.aiScript.userText %></p>
             </div>
             <div class="bg-blue-50 rounded-lg p-4">
-              <h3 class="text-sm font-medium text-blue-600 mb-2">
-                발음 분석 결과
-              </h3>
+              <h3 class="text-sm font-medium text-blue-600 mb-2">발음 분석 결과</h3>
               <p class="text-blue-800"><%= voiceItem.aiScript.aiText %></p>
             </div>
           </div>
         </div>
-        <% } %>
-      </div>
+      <% } %>
     </div>
-  </body>
+  </div>
+</body>
 </html>

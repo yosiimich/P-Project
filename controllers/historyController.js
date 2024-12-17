@@ -70,7 +70,7 @@ const getHistory = asyncHandler(async (req, res) => {
               if (err) return reject(err);
               if (aiScriptResults.length > 0) {
                 resolve({
-                  user: voice.script, // voice 테이블의 script 컬럼 사용
+                  user: aiScriptResults[0].user,
                   ai: aiScriptResults[0].ai,
                 });
               } else {
@@ -85,8 +85,8 @@ const getHistory = asyncHandler(async (req, res) => {
           url: voice.url,
           time: voice.created_at,
           aiScript: {
-            userText: voice.script, // voice 테이블의 script 값 사용
-            aiText: aivoiceText.ai, // ai_voice 테이블의 ai 값
+            userText: aivoiceText.user,
+            aiText: aivoiceText.ai,
           },
         };
       })
@@ -118,33 +118,29 @@ const getScriptHistory = asyncHandler(async (req, res) => {
       return res.status(401).json({ message: "script not found" });
     } else {
       const script = results[0];
-      dbConnect.query(
-        "SELECT * FROM ai_script WHERE script_id=?",
-        [script.id],
-        (error, results) => {
-          if (error) {
-            return res.status(500).json({ message: "Internal Server Error" });
-          }
-          if (results.length == 0) {
-            return res.status(401).json({ message: "script not found" });
-          }
-          const ai_script = results[0];
-          res.render("historyDetail", {
-            title: "맞춤법", // 제목 설정
-            type: "spelling", // 스크립트 타입
-            script: {
-              id: script.id,
-              title: script.title,
-              text: script.content,
-              time: script.created_at,
-              aiScript: {
-                text: ai_script.text, // ai_script.text 값을 넘겨줍니다.
-              },
-            },
-            layout: "layouts/mainFrame", // 필요한 레이아웃을 추가
-          });
+      dbConnect.query("SELECT * FROM ai_script WHERE script_id=?", [script.id], (error, results) => {
+        if (error) {
+          return res.status(500).json({ message: "Internal Server Error" });
         }
-      );
+        if (results.length == 0) {
+          return res.status(401).json({ message: "script not found" });
+        }
+        const ai_script = results[0];
+        res.render("historyDetail", {
+          title: "맞춤법", // 제목 설정
+          type: "spelling", // 스크립트 타입
+          script: {
+            id: script.id,
+            title: script.title,
+            text: script.content,
+            time: script.created_at,
+            aiScript: {
+              text: ai_script.text,  // ai_script.text 값을 넘겨줍니다.
+            },
+          },
+          layout: "layouts/mainFrame", // 필요한 레이아웃을 추가
+        });
+      });
     }
   });
 });
@@ -152,54 +148,41 @@ const getScriptHistory = asyncHandler(async (req, res) => {
 // 음성 세부 정보
 const getVoiceHistory = asyncHandler(async (req, res) => {
   const id = req.params.id;
-  console.log("Voice ID:", id);
-
   dbConnect.query("SELECT * FROM voice WHERE id=?", [id], (error, results) => {
     if (error) {
-      console.error("Voice Query Error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
     }
     if (results.length == 0) {
-      console.log("No voice found for ID:", id);
       return res.status(401).json({ message: "voice not found" });
     } else {
       const voice = results[0];
-      console.log("Voice data:", voice);
-
-      dbConnect.query(
-        "SELECT * FROM ai_voice WHERE voice_id=?",
-        [voice.id],
-        (error, results) => {
-          if (error) {
-            console.error("AI Voice Query Error:", error);
-            return res.status(500).json({ message: "Internal Server Error" });
-          }
-          if (results.length == 0) {
-            console.log("No AI voice data found");
-            return res.status(401).json({ message: "voice not found" });
-          }
-          const ai_voice = results[0];
-          console.log("AI Voice data:", ai_voice);
-
-          const renderData = {
-            title: "발음",
-            type: "pronunciation",
-            voiceItem: {
-              id: voice.id,
-              url: voice.url,
-              time: voice.created_at,
-              aiScript: {
-                userText: voice.script, // voice 테이블의 script 컬럼 사용
-                aiText: ai_voice.ai.trim(), // 줄바꿈 제거
-              },
-            },
-            layout: "layouts/mainFrame",
-          };
-          console.log("Render data:", renderData);
-
-          res.render("historyDetail", renderData);
+      dbConnect.query("SELECT * FROM ai_voice WHERE voice_id=?", [voice.id], (error, results) => {
+        if (error) {
+          return res.status(500).json({ message: "Internal Server Error" });
         }
-      );
+        if (results.length == 0) {
+          return res.status(401).json({ message: "voice not found" });
+        }
+        const ai_voice = results[0];
+
+        const aivoiceText = {
+          user: ai_voice.user,
+          ai: ai_voice.ai
+        };
+        res.render("historyDetail", {
+          title: "발음", // 제목 설정
+          type: "pronunciation", // 발음 타입
+          voiceItem: {
+            id: voice.id,
+            url: voice.url,
+            time: voice.created_at,
+            aiScript: {
+              userText: aivoiceText.user,
+              aiText: aivoiceText.ai,
+          },
+        },
+        });
+      });
     }
   });
 });
