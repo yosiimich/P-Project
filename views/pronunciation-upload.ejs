@@ -117,7 +117,10 @@
   document.getElementById("audio").addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (!file.type.includes("audio/mpeg") && !file.type.includes("audio/mp3")) {
+      if (
+        !file.type.includes("audio/mpeg") &&
+        !file.type.includes("audio/mp3")
+      ) {
         alert("MP3 파일만 업로드 가능합니다.");
         e.target.value = "";
         return;
@@ -154,19 +157,19 @@
         });
 
         if (response.ok) {
-  const data = await response.json();
-  console.log('Upload response:', data);  // 응답 데이터 확인
-  
-  const params = new URLSearchParams({
-    url: data.fileUrl || '',
-    userText: data.userText || '',  // 파라미터 이름 일치시키기
-    aiText: data.aiText || ''       // 파라미터 이름 일치시키기
-  });
-  
-  const redirectUrl = '/pronunciation/result?' + params.toString();
-  console.log('Redirecting to:', redirectUrl);  // 리다이렉트 URL 확인
-  window.location.href = redirectUrl;
-} else {
+          const data = await response.json();
+          console.log("Upload response:", data); // 응답 데이터 확인
+
+          const params = new URLSearchParams({
+            url: data.fileUrl || "",
+            userText: data.userText || "", // 파라미터 이름 일치시키기
+            aiText: data.aiText || "", // 파라미터 이름 일치시키기
+          });
+
+          const redirectUrl = "/pronunciation/result?" + params.toString();
+          console.log("Redirecting to:", redirectUrl); // 리다이렉트 URL 확인
+          window.location.href = redirectUrl;
+        } else {
           throw new Error("Upload failed");
         }
       } catch (error) {

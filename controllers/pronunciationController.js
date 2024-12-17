@@ -5,10 +5,10 @@ const dbConnect = require("../config/dbConnect");
 const path = require("path");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const jwtSecret = process.env.JWT_SECRET; // npm i jsonwebtoken
-const fs = require('fs')
+const fs = require("fs");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const { spawn } = require('child_process');
+const { spawn } = require("child_process");
 
 const s3 = new S3Client({
   region: "ap-northeast-2", // 서울로 기입했으면 이거 기입
@@ -80,28 +80,37 @@ const saveAndUpload = asyncHandler(async (req, res, next) => {
       });
     }
 
-    // 로컬에 저장된 파일 경로
-    const localFilePath = path.join(__dirname, "../tmp", req.file.filename);
-    console.log(`File uploaded locally: ${localFilePath}`);
-    res.locals.fileName = localFilePath;
-    // S3로 업로드
     try {
-      const uploadResult = await s3.send(new PutObjectCommand({
-        Bucket: "pproject-voice",
-        Key: `uploads/${Date.now()}${path.extname(req.file.originalname)}`,
-        Body: fs.createReadStream(localFilePath),
-        ContentType: req.file.mimetype,
-      }));
+      // 로컬에 저장된 파일 경로
+      const localFilePath = path.join(__dirname, "../tmp", req.file.filename);
+      console.log(`File uploaded locally: ${localFilePath}`);
+      res.locals.fileName = localFilePath;
+
+      // timestamp를 한 번만 생성
+      const timestamp = Date.now();
+      const s3Key = `uploads/${timestamp}${path.extname(
+        req.file.originalname
+      )}`;
+
+      // S3로 업로드
+      const uploadResult = await s3.send(
+        new PutObjectCommand({
+          Bucket: "pproject-voice",
+          Key: s3Key,
+          Body: fs.createReadStream(localFilePath),
+          ContentType: req.file.mimetype,
+          ACL: "public-read", // 파일을 공개적으로 접근 가능하게 설정
+        })
+      );
 
       if (uploadResult.$metadata.httpStatusCode === 200) {
         console.log("File successfully uploaded to S3");
-        res.locals.fileUrl = `https://pproject-voice.s3.amazonaws.com/uploads/${Date.now()}${path.extname(req.file.originalname)}`;
+        res.locals.fileUrl = `https://pproject-voice.s3.amazonaws.com/${s3Key}`;
+        console.log("S3 File URL:", res.locals.fileUrl); // URL 로깅
         next();
       } else {
         console.error("S3 Upload Error: Unsuccessful upload");
-        return res
-          .status(500)
-          .send({ message: "S3 file upload failed" });
+        return res.status(500).send({ message: "S3 file upload failed" });
       }
     } catch (s3Error) {
       console.error("S3 Upload Error:", s3Error);
@@ -114,7 +123,7 @@ const saveAndUpload = asyncHandler(async (req, res, next) => {
 
 const savePronunciation = asyncHandler(async (req, res, next) => {
   const fileUrl = res.locals.fileUrl;
-  const {title, text} = req.body;
+  const { title, text } = req.body;
   const token = req.cookies.token;
   const decoded = jwt.verify(token, jwtSecret);
   const email = decoded.email;
@@ -135,45 +144,65 @@ const savePronunciation = asyncHandler(async (req, res, next) => {
 
 const pronunciationCheck = async (req, res) => {
   const fileUrl = res.locals.fileUrl;
-  const {title, text} = req.body;
-  const fileName = res.locals.fileName
+  const { title, text } = req.body;
+  const fileName = res.locals.fileName;
   console.log("Pronunciation check started for file:", fileUrl);
 
   let ai = "";
 
-  const pythonProcess = spawn('python', ['../AI/voice.py', '--model_path', '../AI/saved_model','--file_path',fileName]);
-    pythonProcess.stdout.on('data', (data) => {
-      ai += data.toString('utf-8');
-      console.log(`${data.toString('utf-8')}`);
-    });
-    
-    // 오류 처리
-    pythonProcess.stderr.on('data', (data) => {
-      console.error(`Error: ${data.toString('utf-8')}`);
-    });
-    
-    // 종료 처리
-    pythonProcess.on('close', (code) => {
-      console.log(`Python process exited with code ${code}`);
-      dbConnect.query(
-        "INSERT INTO ai_voice (voice_id, ai) VALUES (?, ?)",
-        [req.voiceId, ai],
-        function (error, results) {
-          if (error) {
-            console.error("Error inserting voice:", error);
-            return res.status(500).json({ message: "Internal Server Error" });
-          }
-          fs.unlinkSync(fileName);
-          return res.status(200).json({
-            fileUrl: fileUrl,
-            userText: text,
-            aiText: ai,
-          });
+  const pythonProcess = spawn("python", [
+    "../AI/voice.py",
+    "--model_path",
+    "../AI/saved_model",
+    "--file_path",
+    fileName,
+  ]);
+  pythonProcess.stdout.on("data", (data) => {
+    ai += data.toString("utf-8");
+    console.log(`${data.toString("utf-8")}`);
+  });
+
+  // 오류 처리
+  pythonProcess.stderr.on("data", (data) => {
+    console.error(`Error: ${data.toString("utf-8")}`);
+  });
+
+  // 종료 처리
+  pythonProcess.on("close", (code) => {
+    console.log(`Python process exited with code ${code}`);
+    dbConnect.query(
+      "INSERT INTO ai_voice (voice_id, ai) VALUES (?, ?)",
+      [req.voiceId, ai],
+      function (error, results) {
+        if (error) {
+          console.error("Error inserting voice:", error);
+          return res
+            .status(500)
+            .json({ message: "Internal Server Error", err: error });
         }
-      );
-    });
-  
+        fs.unlinkSync(fileName);
+
+        return res.status(200).json({
+          fileUrl: fileUrl,
+          userText: text,
+          aiText: ai,
+        });
+      }
+    );
+  });
+
   // 발음 검사 로직 추가
+};
+
+const getPronunciationResult = (req, res) => {
+  const { url, userText, aiText } = req.query;
+  console.log("Query params received:", req.query); // 디버깅용 로그 추가
+
+  res.locals.fileUrl = url;
+  res.locals.userText = userText;
+  res.locals.aiText = aiText;
+
+  res.render("pronunciation-check");
 };
 
 module.exports = {
@@ -181,4 +210,5 @@ module.exports = {
   saveAndUpload,
   savePronunciation,
   pronunciationCheck,
+  getPronunciationResult,
 };
