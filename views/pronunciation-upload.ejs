@@ -3,6 +3,30 @@
 
   <div class="bg-white shadow rounded-lg p-6">
     <form id="upload-form" enctype="multipart/form-data">
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
+        <input
+          type="text"
+          id="title-input"
+          name="title"
+          class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2"
+          required
+        />
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          읽을 문장을 입력하세요
+        </label>
+        <textarea
+          id="text-input"
+          name="text"
+          rows="4"
+          class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-2"
+          required
+        ></textarea>
+      </div>
+
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-2">
           발음 체크를 위한 음성 파일 업로드
@@ -48,6 +72,7 @@
                   type="file"
                   class="sr-only"
                   accept=".mp3,audio/mpeg"
+                  required
                 />
               </label>
             </div>
@@ -92,10 +117,7 @@
   document.getElementById("audio").addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (
-        !file.type.includes("audio/mpeg") &&
-        !file.type.includes("audio/mp3")
-      ) {
+      if (!file.type.includes("audio/mpeg") && !file.type.includes("audio/mp3")) {
         alert("MP3 파일만 업로드 가능합니다.");
         e.target.value = "";
         return;
@@ -118,7 +140,12 @@
 
       const formData = new FormData();
       const audioFile = document.getElementById("audio").files[0];
+      const title = document.getElementById("title-input").value;
+      const text = document.getElementById("text-input").value;
+
       formData.append("audio", audioFile);
+      formData.append("title", title);
+      formData.append("text", text);
 
       try {
         const response = await fetch("/pronunciation", {
@@ -127,13 +154,19 @@
         });
 
         if (response.ok) {
-          const data = await response.json();
-          window.location.href = `/pronunciation-result?url=${encodeURIComponent(
-            data.fileUrl
-          )}&user=${encodeURIComponent(data.userText)}&ai=${encodeURIComponent(
-            data.aiText
-          )}`;
-        } else {
+  const data = await response.json();
+  console.log('Upload response:', data);  // 응답 데이터 확인
+  
+  const params = new URLSearchParams({
+    url: data.fileUrl || '',
+    userText: data.userText || '',  // 파라미터 이름 일치시키기
+    aiText: data.aiText || ''       // 파라미터 이름 일치시키기
+  });
+  
+  const redirectUrl = '/pronunciation/result?' + params.toString();
+  console.log('Redirecting to:', redirectUrl);  // 리다이렉트 URL 확인
+  window.location.href = redirectUrl;
+} else {
           throw new Error("Upload failed");
         }
       } catch (error) {
