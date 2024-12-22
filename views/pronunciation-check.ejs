@@ -28,19 +28,19 @@
     </div>
 
     <!-- AI 분석 결과 -->
-    <div class="bg-white shadow rounded-lg p-6">
+    <!-- <div class="bg-white shadow rounded-lg p-6">
       <h2 class="text-lg font-medium text-gray-900 mb-4">AI 피드백</h2>
       <div class="space-y-4">
         <div class="p-4 bg-blue-50 rounded-md">
           <h3 class="text-md font-medium text-blue-700 mb-2">발음 교정 사항</h3>
-          <div id="ai-feedback" class="text-sm text-blue-600">
+          <div id="ai-feedback" class="text-sm text-blue-600"> -->
             <!-- AI 피드백이 여기에 표시됩니다 -->
-          </div>
+          <!-- </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</div> -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -55,20 +55,50 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Received params:', { audioUrl, userText, aiText });
 
   const compareAndHighlight = (original, pronounced) => {
-  const originalWords = original.split(' ');
-  const pronouncedWords = pronounced.split(' ');
-  let result = '';
+    const originalWords = original.split(' ');
+    const pronouncedWords = pronounced.split(' ');
+    let result = '';
 
-  pronouncedWords.forEach((word, i) => {
-    if (word !== originalWords[i]) {
-      result += `<span class="text-red-500 font-medium">${word}</span> `;
-    } else {
-      result += word + ' ';
-    }
-  });
+    pronouncedWords.forEach((word, i) => {
+      if (word !== originalWords[i]) {
+        result += `<span class="text-red-500 font-medium">${word}</span> `;
+      } else {
+        result += word + ' ';
+      }
+    });
 
-  return result.trim();
-};
+    return result.trim();
+  };
+
+  const addPeriodIfNeeded = (text) => {
+    // 텍스트를 단어별로 나누지 않고 특정 패턴을 기준으로 문장을 분리
+    const sentences = text.split(/(?<=요|다|니)(?=\s|$)/g);
+
+    // 각 문장에 온점을 추가
+    const correctedText = sentences
+      .map(sentence => {
+        const trimmed = sentence.trim();
+
+        // 특정 패턴에 따라 처리
+        if (trimmed.endsWith('입니') || 
+            trimmed.endsWith('습니') || 
+            trimmed.endsWith('합니')) {
+          return trimmed + '다.'; // '니'로 끝나는 경우 '다.' 추가
+        } 
+        if (trimmed.endsWith('다')) {
+          return trimmed + '.'; // '다'로 끝나는 경우 온점 추가
+        } 
+        if (trimmed.endsWith('요')) {
+          return trimmed + '.'; // '요'로 끝나는 경우 온점 추가
+        }
+
+        // 위의 조건에 해당하지 않는 경우 원문 그대로 반환
+        return trimmed;
+      })
+      .join(' '); // 문장들을 다시 합침
+
+    return correctedText;
+  };
 
   // 오디오 플레이어 설정
   if (audioUrl) {
@@ -118,17 +148,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Found differences:', differences);
 
-    aiFeedbackElement.innerHTML = `
-      <div class="space-y-2">
-        <p class="font-medium">교정이 필요한 발음:</p>
-        <ul class="list-disc pl-5">
-          ${differences.map(diff => `<li>${diff}</li>`).join('')}
-        </ul>
-        <p class="mt-4 text-sm">정확한 발음을 위해 천천히 또박또박 읽어보세요.</p>
-      </div>
-    `;
-  } else {
-    console.log('Missing either AI text or user text');
+//     aiFeedbackElement.innerHTML = `
+//       <div class="space-y-2">
+//         <p class="font-medium">교정이 필요한 발음:</p>
+//         <ul class="list-disc pl-5">
+//           ${differences.map(diff => `<li>${diff}</li>`).join('')}
+//         </ul>
+//         <p class="mt-4 text-sm">정확한 발음을 위해 천천히 또박또박 읽어보세요.</p>
+//       </div>
+//     `;
+    
+//     발음 교정 후 텍스트 생성
+//     const correctedAiText = addPeriodIfNeeded(aiText);
+
+//     aiFeedbackElement.innerHTML += `
+//       <div class="space-y-2 mt-4">
+//         <p class="font-medium">AI 발음 교정 후:</p>
+//         <p class="text-sm text-gray-600">${correctedAiText}</p>
+//       </div>
+//     `;
+//   } else {
+//     console.log('Missing either AI text or user text');
   }
 });
 </script>

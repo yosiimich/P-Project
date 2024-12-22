@@ -142,6 +142,37 @@ const savePronunciation = asyncHandler(async (req, res, next) => {
   );
 });
 
+const addPeriodIfNeeded = (text) => {
+  // 텍스트를 단어별로 나누지 않고 특정 패턴을 기준으로 문장을 분리
+  const sentences = text.split(/(?<=요|다|니)(?=\s|$)/g);
+
+  // 각 문장에 온점을 추가
+  const correctedText = sentences
+    .map(sentence => {
+      const trimmed = sentence.trim();
+
+      // 특정 패턴에 따라 처리
+      if (trimmed.endsWith('입니') || 
+          trimmed.endsWith('습니') || 
+          trimmed.endsWith('합니')) {
+        return trimmed + '다.'; // '니'로 끝나는 경우 '다.' 추가
+      } 
+      if (trimmed.endsWith('다')) {
+        return trimmed + '.'; // '다'로 끝나는 경우 온점 추가
+      } 
+      if (trimmed.endsWith('요')) {
+        return trimmed + '.'; // '요'로 끝나는 경우 온점 추가
+      }
+
+      // 위의 조건에 해당하지 않는 경우 원문 그대로 반환
+      return trimmed;
+    })
+    .join(' '); // 문장들을 다시 합침
+
+  return correctedText;
+};
+
+
 const pronunciationCheck = async (req, res) => {
   const fileUrl = res.locals.fileUrl;
   const { title, text } = req.body;
@@ -170,9 +201,10 @@ const pronunciationCheck = async (req, res) => {
   // 종료 처리
   pythonProcess.on("close", (code) => {
     console.log(`Python process exited with code ${code}`);
+    const correctedAiText = addPeriodIfNeeded(ai);
     dbConnect.query(
       "INSERT INTO ai_voice (voice_id, ai) VALUES (?, ?)",
-      [req.voiceId, ai],
+      [req.voiceId, correctedAiText],
       function (error, results) {
         if (error) {
           console.error("Error inserting voice:", error);
@@ -181,11 +213,11 @@ const pronunciationCheck = async (req, res) => {
             .json({ message: "Internal Server Error", err: error });
         }
         fs.unlinkSync(fileName);
-
+        
         return res.status(200).json({
           fileUrl: fileUrl,
           userText: text,
-          aiText: ai,
+          aiText: correctedAiText,
         });
       }
     );
