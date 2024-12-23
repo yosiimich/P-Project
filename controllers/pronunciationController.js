@@ -129,8 +129,8 @@ const savePronunciation = asyncHandler(async (req, res, next) => {
   const email = decoded.email;
 
   dbConnect.query(
-    "INSERT INTO voice (author_email, url, script) VALUES (?, ?, ?)",
-    [email, fileUrl, text],
+    "INSERT INTO voice (author_email, url, script, title) VALUES (?, ?, ?, ?)",
+    [email, fileUrl, text, title],
     function (error, results) {
       if (error) {
         console.error("Error inserting voice:", error);
