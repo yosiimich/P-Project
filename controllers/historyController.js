@@ -70,7 +70,6 @@ const getHistory = asyncHandler(async (req, res) => {
               if (err) return reject(err);
               if (aiScriptResults.length > 0) {
                 resolve({
-                  user: aiScriptResults[0].user,
                   ai: aiScriptResults[0].ai,
                 });
               } else {
@@ -83,9 +82,10 @@ const getHistory = asyncHandler(async (req, res) => {
         return {
           id: voice.id,
           url: voice.url,
+          title: voice.title,
           time: voice.created_at,
           aiScript: {
-            userText: aivoiceText.user,
+            userText: voice.script,
             aiText: aivoiceText.ai,
           },
         };
@@ -155,6 +155,7 @@ const getVoiceHistory = asyncHandler(async (req, res) => {
     if (results.length == 0) {
       return res.status(401).json({ message: "voice not found" });
     } else {
+	console.log(results);
       const voice = results[0];
       dbConnect.query("SELECT * FROM ai_voice WHERE voice_id=?", [voice.id], (error, results) => {
         if (error) {
@@ -166,7 +167,6 @@ const getVoiceHistory = asyncHandler(async (req, res) => {
         const ai_voice = results[0];
 
         const aivoiceText = {
-          user: ai_voice.user,
           ai: ai_voice.ai
         };
         res.render("historyDetail", {
@@ -175,9 +175,10 @@ const getVoiceHistory = asyncHandler(async (req, res) => {
           voiceItem: {
             id: voice.id,
             url: voice.url,
+            title: voice.title,
             time: voice.created_at,
             aiScript: {
-              userText: aivoiceText.user,
+              userText: voice.script,
               aiText: aivoiceText.ai,
           },
         },

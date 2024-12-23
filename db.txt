@@ -105,3 +105,6 @@ ALTER TABLE `voice`
 ADD COLUMN `script` TEXT;
 
 ALTER TABLE `ai_voice` DROP COLUMN `user`;
+
+ALTER TABLE `voice`
+ADD COLUMN `title` TEXT;

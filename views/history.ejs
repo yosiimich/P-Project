@@ -46,7 +46,7 @@
                   <span class="text-sm text-gray-500 ml-2"><%= new Date(voiceItem.time).toLocaleString() %></span>
                 </div>
               </div>
-              <div class="font-medium mb-4 line-clamp-2"><%= voiceItem.aiScript.userText || '분석 중...' %></div>
+              <div class="font-medium mb-4 line-clamp-2"><%= voiceItem.title  %></div>
               <audio controls class="w-full">
                 <source src="<%= voiceItem.url %>" type="audio/mp3" />
               </audio>
